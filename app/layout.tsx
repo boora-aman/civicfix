@@ -5,15 +5,22 @@ import "./globals.css"
 import { MainNav } from "@/components/main-nav"
 import { UserNav } from "@/components/user-nav"
 import { ThemeProvider } from "@/components/theme-provider"
-import { Toaster } from "@/components/toaster"
+import { Toaster } from "@/components/ui/toaster"
 import { AuthProvider } from "@/components/auth-provider"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "CivicFix - Report & Track Community Issues",
-  description: "A platform for citizens to report and track infrastructure issues in their community",
-    generator: 'v0.dev'
+  title: "CivicFix - Community Issue Reporting Platform",
+  description: "Report and track community issues, collaborate with local authorities, and make your neighborhood better.",
+  keywords: ["community", "issues", "reporting", "local government", "civic engagement"],
+  authors: [{ name: "CivicFix Team" }],
+  creator: "CivicFix",
+  publisher: "CivicFix",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
 }
 
 export default function RootLayout({
@@ -23,6 +30,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+      </head>
       <body className={inter.className}>
         <AuthProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
@@ -51,7 +62,5 @@ export default function RootLayout({
     </html>
   )
 }
-
-
 
 import './globals.css'

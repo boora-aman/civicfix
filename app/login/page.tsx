@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Checkbox } from "@/components/ui/checkbox"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { signIn } from "next-auth/react"
+import { signIn, getSession } from "next-auth/react"
 import { useToast } from "@/hooks/use-toast"
 
 export default function LoginPage() {
@@ -28,25 +28,31 @@ export default function LoginPage() {
 
     try {
       const result = await signIn("credentials", {
-        redirect: false,
         email,
         password,
+        redirect: false,
       })
 
       if (result?.error) {
         toast({
-          title: "Login failed",
-          description: "Invalid email or password. Please try again.",
+          title: "Error",
+          description: "Invalid email or password",
           variant: "destructive",
         })
+        return
+      }
+
+      // Redirect based on user role
+      const session = await getSession()
+      if (session?.user?.role === "ADMIN") {
+        router.push("/admin")
       } else {
-        router.push(callbackUrl)
+        router.push("/dashboard")
       }
     } catch (error) {
-      console.error("Login error:", error)
       toast({
-        title: "Login failed",
-        description: "An unexpected error occurred. Please try again.",
+        title: "Error",
+        description: "Something went wrong. Please try again.",
         variant: "destructive",
       })
     } finally {

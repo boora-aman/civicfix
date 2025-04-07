@@ -1,44 +1,33 @@
+import { withAuth } from "next-auth/middleware"
 import { NextResponse } from "next/server"
-import type { NextRequest } from "next/server"
-import { getToken } from "next-auth/jwt"
 
-export async function middleware(request: NextRequest) {
-  const token = await getToken({ req: request })
-  const isAuthenticated = !!token
-  const isAdmin = token?.role === "ADMIN"
-  const path = request.nextUrl.pathname
+export default withAuth(
+  function middleware(req) {
+    const token = req.nextauth.token
+    const isAdmin = token?.role === "ADMIN"
+    const isAdminRoute = req.nextUrl.pathname.startsWith("/admin")
+    const isDashboardRoute = req.nextUrl.pathname.startsWith("/dashboard")
 
-  // Public routes accessible to all users
-  const publicRoutes = ["/", "/login", "/register", "/issues", "/issues/[id]"]
-
-  // Routes that require authentication
-  const authRoutes = ["/dashboard", "/issues/new"]
-
-  // Routes that require admin access
-  const adminRoutes = ["/admin"]
-
-  // Check if the path is an admin route
-  if (path.startsWith("/admin")) {
-    if (!isAuthenticated) {
-      return NextResponse.redirect(new URL("/login", request.url))
+    // Redirect admins away from dashboard to admin page
+    if (isAdmin && isDashboardRoute) {
+      return NextResponse.redirect(new URL("/admin", req.url))
     }
 
-    if (!isAdmin) {
-      return NextResponse.redirect(new URL("/", request.url))
+    // Redirect non-admins away from admin routes
+    if (!isAdmin && isAdminRoute) {
+      return NextResponse.redirect(new URL("/dashboard", req.url))
     }
+
+    return NextResponse.next()
+  },
+  {
+    callbacks: {
+      authorized: ({ token }) => !!token,
+    },
   }
-
-  // Check if the path requires authentication
-  if (authRoutes.some((route) => path.startsWith(route.replace("[id]", "")))) {
-    if (!isAuthenticated) {
-      return NextResponse.redirect(new URL("/login", request.url))
-    }
-  }
-
-  return NextResponse.next()
-}
+)
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/issues/new", "/admin/:path*"],
+  matcher: ["/dashboard/:path*", "/admin/:path*"],
 }
 

@@ -4,79 +4,40 @@ import { authOptions } from "../auth/[...nextauth]/route"
 import prisma from "@/lib/prisma"
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url)
-  const session = await getServerSession(authOptions)
-  
-  // Check if user is an admin
-  let isAdmin = false
-  if (session?.user) {
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-    })
-    isAdmin = user?.role === "ADMIN"
-  }
-
-  // Build query filters
-  const category = searchParams.get("category")
-  const status = searchParams.get("status")
-  const sort = searchParams.get("sort") || "newest"
-  const page = parseInt(searchParams.get("page") || "1")
-  const showAll = searchParams.get("showAll") === "true" && isAdmin // Only admins can see all issues
-  const limit = 10
-  const skip = (page - 1) * limit
-
-  // Filter conditions
-  const where: any = {}
-
-  // For regular users, only show approved or in-progress issues by default
-  if (!showAll && !isAdmin) {
-    where.status = {
-      in: ["APPROVED", "IN_PROGRESS", "RESOLVED"],
-    }
-  } else if (status) {
-    where.status = status.toUpperCase()
-  }
-
-  if (category) {
-    where.category = category
-  }
-
-  // Sort options
-  let orderBy: any = {}
-  switch (sort) {
-    case "oldest":
-      orderBy = { createdAt: "asc" }
-      break
-    case "priority":
-      orderBy = [{ priority: "desc" }, { createdAt: "desc" }]
-      break
-    case "status":
-      orderBy = [{ status: "asc" }, { createdAt: "desc" }]
-      break
-    default:
-      orderBy = { createdAt: "desc" }
-  }
-
   try {
+    const { searchParams } = new URL(request.url)
+    const page = parseInt(searchParams.get("page") || "1")
+    const limit = parseInt(searchParams.get("limit") || "10")
+    const sort = searchParams.get("sort") || "newest"
+    const status = searchParams.get("status") || "all"
+    const category = searchParams.get("category") || "all"
+
+    const skip = (page - 1) * limit
+
+    // Build where clause
+    const where: any = {}
+    if (status !== "all") {
+      where.status = status
+    }
+    if (category !== "all") {
+      where.category = category
+    }
+
+    // Get total count for pagination
+    const total = await prisma.issue.count({ where })
+
+    // Get issues with relations
     const issues = await prisma.issue.findMany({
       where,
-      orderBy,
-      skip,
-      take: limit,
       include: {
         user: {
           select: {
-            id: true,
             name: true,
-            image: true,
+            email: true,
           },
         },
-        images: {
-          select: {
-            id: true,
-            url: true,
-          },
-        },
+        upvotes: true,
+        comments: true,
         _count: {
           select: {
             upvotes: true,
@@ -84,12 +45,28 @@ export async function GET(request: Request) {
           },
         },
       },
+      orderBy: {
+        createdAt: sort === "newest" ? "desc" : "asc",
+      },
+      skip,
+      take: limit,
     })
 
-    return NextResponse.json(issues)
+    return NextResponse.json({
+      issues,
+      pagination: {
+        total,
+        pages: Math.ceil(total / limit),
+        page,
+        limit,
+      },
+    })
   } catch (error) {
     console.error("Error fetching issues:", error)
-    return NextResponse.json({ error: "Failed to fetch issues" }, { status: 500 })
+    return NextResponse.json(
+      { error: "Failed to fetch issues" },
+      { status: 500 }
+    )
   }
 }
 

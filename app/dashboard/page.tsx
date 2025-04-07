@@ -64,42 +64,6 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!loading && userIssues.length === 0 && status === "authenticated") {
       const mockIssues = [
-        {
-          id: "1",
-          title: "Large Pothole on Main Street",
-          description: "Deep pothole causing traffic hazards near the intersection with Oak Avenue",
-          location: "Main St & Oak Ave",
-          category: "Pothole",
-          priority: "High",
-          status: "In Progress",
-          createdAt: new Date("2023-11-15T10:30:00Z").toISOString(),
-          upvotes: 12,
-          comments: 5,
-        },
-        {
-          id: "2",
-          title: "Broken Sidewalk",
-          description: "Cracked and uneven sidewalk creating accessibility issues",
-          location: "123 Elm Street",
-          category: "Sidewalk",
-          priority: "Medium",
-          status: "Approved",
-          createdAt: new Date("2023-11-10T14:45:00Z").toISOString(),
-          upvotes: 5,
-          comments: 2,
-        },
-        {
-          id: "3",
-          title: "Street Light Outage",
-          description: "Multiple street lights not working, creating safety concerns at night",
-          location: "Pine Avenue",
-          category: "Lighting",
-          priority: "Urgent",
-          status: "Pending",
-          createdAt: new Date("2023-11-18T09:15:00Z").toISOString(),
-          upvotes: 3,
-          comments: 1,
-        },
       ] as Issue[]
 
       setUserIssues(mockIssues)

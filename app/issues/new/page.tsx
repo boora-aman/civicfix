@@ -1,8 +1,7 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -21,9 +20,11 @@ export default function NewIssuePage() {
   const { toast } = useToast()
 
   // Redirect to login if not authenticated
-  if (status === "unauthenticated") {
-    router.push("/login?callbackUrl=/issues/new")
-  }
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login?callbackUrl=/issues/new")
+    }
+  }, [status, router])
 
   const [images, setImages] = useState<{ file: File; preview: string }[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -151,6 +152,10 @@ export default function NewIssuePage() {
     )
   }
 
+  if (!session?.user) {
+    return null // Return null while redirecting
+  }
+
   return (
     <main className="flex-1 container py-10">
       <Button variant="ghost" size="sm" asChild className="mb-6">
@@ -193,10 +198,12 @@ export default function NewIssuePage() {
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="pothole">Pothole</SelectItem>
-                        <SelectItem value="signage">Damaged Signage</SelectItem>
-                        <SelectItem value="roadwork">Roadwork</SelectItem>
-                        <SelectItem value="trash">Trash & Debris</SelectItem>
+                        <SelectItem value="Damaged Playground Equipment">Damaged Playground Equipment</SelectItem>
+                        <SelectItem value="Pothole on Main Street">Pothole on Main Street</SelectItem>
+                        <SelectItem value="Broken Street Light">Broken Street Light</SelectItem>
+                        <SelectItem value="Overflowing Trash Bin">Overflowing Trash Bin</SelectItem>
+                        <SelectItem value="Graffiti on Public Library">Graffiti on Public Library</SelectItem>
+                        <SelectItem value="Other">Other</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -208,10 +215,10 @@ export default function NewIssuePage() {
                         <SelectValue placeholder="Select priority" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="low">Low</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="high">High</SelectItem>
-                        <SelectItem value="critical">Critical</SelectItem>
+                        <SelectItem value="LOW">Low</SelectItem>
+                        <SelectItem value="MEDIUM">Medium</SelectItem>
+                        <SelectItem value="HIGH">High</SelectItem>
+                        <SelectItem value="URGENT">Urgent</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -248,56 +255,52 @@ export default function NewIssuePage() {
                   <Textarea
                     id="locationDetails"
                     name="locationDetails"
-                    placeholder="E.g., Near the corner of Elm and Main, in front of the library"
+                    placeholder="Provide additional details about the exact location (e.g., 'Near the corner of Main St and 5th Ave', 'Behind the community center')"
                     className="min-h-[80px]"
                   />
                 </div>
 
                 {/* Image Upload */}
                 <div className="space-y-2">
-                  <Label>
-                    Upload Images (Max 5)
-                    <Input
-                      type="file"
-                      multiple
-                      accept="image/*"
-                      className="hidden"
-                      id="image-upload"
-                      onChange={handleImageUpload}
-                    />
-                    <Button asChild variant="secondary">
-                      <label htmlFor="image-upload" className="flex items-center space-x-2">
-                        <Upload className="h-4 w-4" />
-                        <span>Select Images</span>
-                      </label>
-                    </Button>
-                  </Label>
-
-                  <div className="flex space-x-4">
+                  <Label>Images (Optional)</Label>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                     {images.map((image, index) => (
-                      <div key={index} className="relative w-24 h-24 rounded-md overflow-hidden">
+                      <div key={index} className="relative aspect-square">
                         <img
-                          src={image.preview || "/placeholder.svg"}
-                          alt={`Uploaded Preview ${index + 1}`}
-                          className="object-cover w-full h-full"
+                          src={image.preview}
+                          alt={`Preview ${index + 1}`}
+                          className="w-full h-full object-cover rounded-lg"
                         />
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="absolute top-1 right-1 bg-background/80 text-foreground hover:bg-background hover:text-foreground"
+                        <button
+                          type="button"
                           onClick={() => removeImage(index)}
+                          className="absolute top-1 right-1 p-1 bg-background/80 rounded-full hover:bg-background"
                         >
                           <X className="h-4 w-4" />
-                          <span className="sr-only">Remove</span>
-                        </Button>
+                        </button>
                       </div>
                     ))}
+                    {images.length < 5 && (
+                      <label className="aspect-square border-2 border-dashed rounded-lg flex items-center justify-center cursor-pointer hover:border-primary">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          className="hidden"
+                          onChange={handleImageUpload}
+                        />
+                        <Upload className="h-8 w-8 text-muted-foreground" />
+                      </label>
+                    )}
                   </div>
+                  <p className="text-sm text-muted-foreground">
+                    Upload up to 5 images. Supported formats: JPG, PNG, GIF. Max size: 5MB per image.
+                  </p>
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="flex justify-end">
-              <Button type="submit" disabled={isSubmitting}>
+            <CardFooter>
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting ? "Submitting..." : "Submit Issue"}
               </Button>
             </CardFooter>
