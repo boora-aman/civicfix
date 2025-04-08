@@ -1,27 +1,38 @@
 # CivicFix: Community Issue Reporting Platform
 
-CivicFix is a web application that enables citizens to report, track, and collaborate on local infrastructure issues in their communities. The platform connects residents with local authorities through a transparent system for reporting problems, tracking their status, and monitoring resolutions.
+CivicFix is a modern web application that empowers citizens to report, track, and collaborate on local infrastructure issues. The platform connects residents with local authorities through a transparent system for reporting problems, tracking their status, and monitoring resolutions.
 
-![CivicFix Demo](https://example.com/civicfix-demo.png)
+## 📸 Screenshots
+
+<!-- Add your screenshots here -->
+- Homepage
+- Issue Reporting Form
+- Issues List
+- Issue Details
+- User Dashboard
+- Admin Dashboard
+- Admin Analytics
 
 ## 🚀 Features
 
 - **User Authentication**: Secure login/registration system with role-based access
-- **Issue Reporting**: Easy-to-use interface for reporting community issues with images and location
-- **Admin Approval System**: Moderation workflow for validating and prioritizing reported issues
+- **Issue Reporting**: Intuitive interface for reporting community issues with images and location
+- **Issue Categories**: Multiple issue types including "Damaged Playground Equipment", "Potholes", "Broken Street Lights", and more
+- **Admin Dashboard**: Real-time statistics and issue management for administrators
 - **Status Tracking**: Real-time updates on issue status (Pending, Approved, In Progress, Resolved)
 - **Community Engagement**: Upvoting and commenting on issues
+- **Interactive Analytics**: Data visualization for administrators to identify trends and priorities
 - **Responsive Design**: Fully responsive interface that works on desktop, tablet, and mobile devices
-- **Dashboard**: Personalized dashboards for users and administrators
 
 ## 💻 Tech Stack
 
 - **Frontend**:
-  - [Next.js](https://nextjs.org/) (v14) - React framework for server-side rendering
+  - [Next.js](https://nextjs.org/) (v14) - React framework with App Router
   - [React](https://reactjs.org/) - UI component library
   - [TypeScript](https://www.typescriptlang.org/) - Type-safe JavaScript
   - [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
   - [Shadcn UI](https://ui.shadcn.com/) - Re-usable UI components
+  - [Recharts](https://recharts.org/) - Responsive charting library
   - [Lucide Icons](https://lucide.dev/) - Icon library
 
 - **Backend**:
@@ -30,36 +41,31 @@ CivicFix is a web application that enables citizens to report, track, and collab
   - [PostgreSQL](https://www.postgresql.org/) - Relational database
   - [NextAuth.js](https://next-auth.js.org/) - Authentication solution
 
-- **Deployment**:
-  - Can be deployed on [Vercel](https://vercel.com/), [Netlify](https://www.netlify.com/), or any platform supporting Next.js
+## 📋 Getting Started
 
-## 📋 Prerequisites
+### Prerequisites
 
 Before you begin, ensure you have the following installed:
 - [Node.js](https://nodejs.org/en/) (v18 or higher)
-- [npm](https://www.npmjs.com/) (v9 or higher) or [yarn](https://yarnpkg.com/) (v1.22 or higher)
+- [npm](https://www.npmjs.com/) (v9 or higher)
 - [PostgreSQL](https://www.postgresql.org/) (v14 or higher)
 
-## 🔧 Installation
+### Installation
 
-### Clone the repository
+1. **Clone the repository**
 
 ```bash
-git clone https://github.com/boora-aman/civicfix.git
+git clone https://github.com/yourusername/civicfix.git
 cd civicfix
 ```
 
-### Install dependencies
+2. **Install dependencies**
 
 ```bash
-# Using npm
 npm install
-
-# Using yarn
-yarn install
 ```
 
-### Environment Setup
+3. **Environment Setup**
 
 Create a `.env` file in the root directory with the following variables:
 
@@ -70,183 +76,216 @@ DATABASE_URL="postgresql://username:password@localhost:5432/civicfix"
 # NextAuth
 NEXTAUTH_URL="http://localhost:3000"
 NEXTAUTH_SECRET="your-nextauth-secret-key" # Generate a random string
-
-# Optional - for email provider
-EMAIL_SERVER_USER=username
-EMAIL_SERVER_PASSWORD=password
-EMAIL_SERVER_HOST=smtp.example.com
-EMAIL_SERVER_PORT=587
-EMAIL_FROM=noreply@example.com
 ```
 
-### Database Setup
-
-1. Create a PostgreSQL database
+4. **Database Setup**
 
 ```bash
-# PostgreSQL command line
-createdb civicfix
-```
+# Generate Prisma client
+npx prisma generate
 
-2. Run Prisma migrations to set up your database schema
-
-```bash
-# Using npx
+# Run migrations
 npx prisma migrate dev --name init
 
-# Using yarn
-yarn prisma migrate dev --name init
+# Seed the database with test data
+npm run prisma:seed
 ```
 
-3. Seed the database with initial data (optional)
+5. **Start the development server**
 
 ```bash
-# Using npx
-npx prisma db seed
-
-# Using yarn
-yarn prisma db seed
-```
-
-## 🚀 Running the Application
-
-### Development Mode
-
-```bash
-# Using npm
 npm run dev
-
-# Using yarn
-yarn dev
 ```
 
 The application will be available at [http://localhost:3000](http://localhost:3000).
 
-### Production Build
+## 👥 User Accounts
 
-```bash
-# Using npm
-npm run build
-npm start
+After running the seed script, the following test accounts are available:
 
-# Using yarn
-yarn build
-yarn start
-```
+### Admin Account
+- Email: `admin@example.com`
+- Password: `admin123`
 
-## 🌐 Platform-Specific Setup
+### Regular User Accounts
+- Email: `user1@example.com` through `user3@example.com`
+- Password: `user123`
 
-### Windows
-
-- Install [PostgreSQL for Windows](https://www.postgresql.org/download/windows/)
-- Ensure `pg_config` is in your PATH environment variable
-- You might need to install [Visual C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) for certain npm packages
-
-### macOS
-
-- Install PostgreSQL using [Homebrew](https://brew.sh/):
-  ```bash
-  brew install postgresql
-  brew services start postgresql
-  ```
-- Create the database:
-  ```bash
-  createdb civicfix
-  ```
-
-### Linux (Ubuntu/Debian)
-
-- Install PostgreSQL:
-  ```bash
-  sudo apt update
-  sudo apt install postgresql postgresql-contrib
-  ```
-- Start and enable PostgreSQL:
-  ```bash
-  sudo systemctl start postgresql
-  sudo systemctl enable postgresql
-  ```
-- Create a PostgreSQL user and database:
-  ```bash
-  sudo -u postgres createuser --interactive
-  sudo -u postgres createdb civicfix
-  ```
-
-### Docker
-
-You can also run the application using Docker:
-
-1. Build the Docker image:
-   ```bash
-   docker build -t civicfix .
-   ```
-
-2. Run with Docker Compose:
-   ```bash
-   docker-compose up
-   ```
-
-## 📱 Usage
+## 📱 Features Walkthrough
 
 ### For Citizens
 
-1. **Register/Login**: Create an account or log in
-2. **Report Issue**: Submit a new issue with description, location, and images
-3. **Track Progress**: Monitor the status of your reported issues
-4. **Engage**: Upvote and comment on issues in your community
+1. **Report an Issue**
+   - Navigate to "Report an Issue" from the homepage or dashboard
+   - Fill in details including title, description, category, priority, and location
+   - Upload images of the issue (optional)
+   - Submit the form to create a new issue
+
+2. **Browse Issues**
+   - View all reported issues on the Issues page
+   - Filter by category or status
+   - Sort by newest, oldest, or most upvoted
+   - Use pagination to navigate through multiple pages of issues
+
+3. **Issue Details**
+   - Click on any issue to view detailed information
+   - See status updates, comments, and location information
+   - Upvote issues to show support
+   - Add comments to provide additional information
+
+4. **User Dashboard**
+   - Track all issues you've reported
+   - Monitor status changes and updates
+   - View pending issues that need attention
 
 ### For Administrators
 
-1. **Review Issues**: View all pending issues reported by users
-2. **Approve/Reject**: Validate issues and set priority levels
-3. **Update Status**: Mark issues as in progress or resolved
-4. **Manage Users**: View user activity and reports
+1. **Admin Dashboard**
+   - View real-time statistics including total issues, pending, in progress, and resolved counts
+   - See priority distribution in an interactive pie chart
+   - Access quick actions for common administrative tasks
 
-## 👥 User Roles
+2. **Issue Management**
+   - Review and approve/reject pending issues
+   - Update status and priority of issues
+   - Add administrative comments visible to users
 
-- **Regular User**: Can report issues, track their submissions, and engage with community reports
-- **Admin**: Full access to manage issues, set priorities, update statuses, and administer the platform
+3. **Analytics**
+   - Visualize data with interactive charts
+   - Track category distribution, priority vs votes, and monthly trends
+   - Identify patterns to inform resource allocation
 
-## 🔒 Admin Account Setup
+## 🛠️ API Endpoints
 
-To create an admin account:
-
-1. Register a regular account through the application
-2. Access the PostgreSQL database:
-   ```bash
-   psql -d civicfix
-   ```
-3. Update the user role to ADMIN:
-   ```sql
-   UPDATE "User" SET role = 'ADMIN' WHERE email = 'your-email@example.com';
-   ```
-
-Alternatively, you can use the admin registration page at `/admin-register` which requires an invitation code.
-
-## 🛠 API Endpoints
-
-The application provides the following API endpoints:
-
-- `GET /api/issues` - Get all approved issues (or all issues for admins)
+### Public Endpoints
+- `GET /api/issues` - List all issues with pagination
+- `GET /api/issues/:id` - Get a specific issue with details
 - `POST /api/issues` - Create a new issue
-- `GET /api/issues/:id` - Get a specific issue
-- `GET /api/issues/featured` - Get featured issues for the homepage
-- `GET /api/admin/issues` - Get all issues (admin only)
-- `PATCH /api/admin/issues/:id` - Update issue status and priority (admin only)
+- `POST /api/issues/:id/upvote` - Upvote an issue
+- `POST /api/issues/:id/comments` - Add a comment to an issue
 
-## 💬 Feedback and Contributions
+### Admin Endpoints
+- `GET /api/admin/overview` - Get dashboard statistics
+- `GET /api/admin/stats` - Get detailed analytics data
+- `PATCH /api/admin/issues/:id` - Update issue status and priority
 
-Feedback and contributions are welcome! Please feel free to submit a pull request or open an issue.
+## 📊 Database Schema
 
-## 📄 License
+The application uses the following main models:
+
+- **User**: User accounts with authentication info and role
+- **Issue**: Community issues with all details and status
+- **Comment**: User comments on issues
+- **Upvote**: User upvotes on issues
+
+## 🧪 Testing
+
+The current version focuses on development. Future versions will include:
+- Unit tests with Jest
+- Integration tests for API endpoints
+- End-to-end tests with Cypress
+
+## 🚀 Deployment
+
+### Deploying to Vercel
+
+1. **Push your code to GitHub**
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial commit"
+   git remote add origin https://github.com/yourusername/civicfix.git
+   git push -u origin main
+   ```
+
+2. **Set up a PostgreSQL database**
+   
+   **Option 1: Vercel Postgres (Recommended)**
+   - Go to [Vercel](https://vercel.com/) and create an account if you don't have one
+   - Create a new project and connect your GitHub repository
+   - In the project settings, go to "Storage" and select "Connect Store"
+   - Choose "Vercel Postgres" and follow the setup wizard
+   - Vercel will automatically add the `POSTGRES_URL` environment variable to your project
+
+   **Option 2: Railway**
+   - Go to [Railway](https://railway.app/) and create an account
+   - Create a new project and select "Provision PostgreSQL"
+   - Once created, go to "Connect" and copy the connection URL
+   - In Vercel, add this URL as the `DATABASE_URL` environment variable
+
+   **Option 3: Supabase**
+   - Go to [Supabase](https://supabase.com/) and create an account
+   - Create a new project
+   - Go to "Settings" > "Database" and copy the connection string
+   - In Vercel, add this URL as the `DATABASE_URL` environment variable
+
+   **Option 4: Neon**
+   - Go to [Neon](https://neon.tech/) and create an account
+   - Create a new project
+   - Copy the connection string from the dashboard
+   - In Vercel, add this URL as the `DATABASE_URL` environment variable
+
+3. **Configure environment variables in Vercel**
+   - In your Vercel project settings, go to "Environment Variables"
+   - Add the following variables:
+     - `DATABASE_URL`: Your PostgreSQL connection string
+     - `NEXTAUTH_URL`: Your Vercel deployment URL (e.g., `https://civicfix.vercel.app`)
+     - `NEXTAUTH_SECRET`: A random string for session encryption (generate with `openssl rand -base64 32`)
+
+4. **Deploy your application**
+   - Vercel will automatically deploy your application when you push to your GitHub repository
+   - You can also manually deploy from the Vercel dashboard
+
+5. **Run database migrations**
+   - After deployment, you need to run your Prisma migrations
+   - You can do this by adding a build command in your `package.json`:
+     ```json
+     "scripts": {
+       "vercel-build": "prisma generate && prisma migrate deploy && next build"
+     }
+     ```
+   - Or by running the migrations manually:
+     ```bash
+     npx prisma migrate deploy
+     ```
+
+6. **Seed the database (optional)**
+   - If you want to seed the database with test data, you can run:
+     ```bash
+     npx prisma db seed
+     ```
+   - Or add it to your build command:
+     ```json
+     "scripts": {
+       "vercel-build": "prisma generate && prisma migrate deploy && prisma db seed && next build"
+     }
+     ```
+
+### Troubleshooting Deployment
+
+- **Database Connection Issues**: Ensure your database connection string is correct and the database is accessible from Vercel's servers
+- **Authentication Problems**: Make sure `NEXTAUTH_URL` is set to your production URL
+- **Migration Errors**: Check that your Prisma schema is compatible with your database provider
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a pull request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgements
+## 👏 Acknowledgements
 
 - [Next.js](https://nextjs.org/)
 - [Prisma](https://www.prisma.io/)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [NextAuth.js](https://next-auth.js.org/)
 - [Shadcn UI](https://ui.shadcn.com/)
-- And all the other open-source projects that made this possible! 
+- [Recharts](https://recharts.org/) 
