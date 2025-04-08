@@ -8,31 +8,33 @@ async function main() {
 
   // Clear existing data
   console.log('Clearing existing data...')
-  await prisma.upvote.deleteMany({})
-  await prisma.comment.deleteMany({})
-  await prisma.issue.deleteMany({})
-  await prisma.user.deleteMany({})
+  await prisma.upvote.deleteMany()
+  await prisma.comment.deleteMany()
+  await prisma.issue.deleteMany()
+  await prisma.user.deleteMany()
 
   console.log('Creating users...')
   
   // Create admin user
-  const adminUser = await prisma.user.create({
+  const adminPassword = await hash('admin123', 10)
+  const admin = await prisma.user.create({
     data: {
-      name: "Admin User",
-      email: "admin@example.com",
-      password: await hash("admin123", 10),
+      name: 'Admin User',
+      email: 'admin@example.com',
+      password: adminPassword,
       role: Role.ADMIN,
     },
   })
 
   // Create regular users
   const users = []
-  for (let i = 1; i <= 3; i++) {
+  for (let i = 1; i <= 20; i++) {
+    const password = await hash('user123', 10)
     const user = await prisma.user.create({
       data: {
         name: `User ${i}`,
         email: `user${i}@example.com`,
-        password: await hash("user123", 10),
+        password,
         role: Role.USER,
       },
     })
@@ -40,78 +42,64 @@ async function main() {
   }
 
   // Sample data for issues
-  const categories = [
-    "Damaged Playground Equipment",
-    "Pothole on Main Street",
-    "Broken Street Light",
-    "Overflowing Trash Bin",
-    "Graffiti on Public Library",
-    "Other",
-  ]
+  const cities = ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego', 'Dallas', 'San Jose']
+  const states = ['NY', 'CA', 'IL', 'TX', 'AZ', 'PA', 'TX', 'CA', 'TX', 'CA']
+  const categories = ['INFRASTRUCTURE', 'SAFETY', 'ENVIRONMENT', 'TRANSPORTATION', 'PUBLIC_SERVICES']
+  const priorities = [Priority.URGENT, Priority.HIGH, Priority.MEDIUM, Priority.LOW]
+  const statuses = [Status.PENDING, Status.IN_PROGRESS, Status.RESOLVED, Status.REJECTED]
 
-  const priorities = [Priority.LOW, Priority.MEDIUM, Priority.HIGH, Priority.URGENT]
-  const statuses = [Status.PENDING, Status.IN_PROGRESS, Status.RESOLVED, Status.APPROVED, Status.REJECTED]
+  console.log('Creating 100 sample issues...')
   
-  const locations = [
-    { city: "Springfield", state: "IL", zip: "62701" },
-    { city: "Riverdale", state: "CA", zip: "93656" },
-    { city: "Oakwood", state: "OH", zip: "45409" },
-    { city: "Franklin", state: "TN", zip: "37064" },
-  ]
+  // Create 100 issues with realistic data
+  const issues = []
+  for (let i = 1; i <= 100; i++) {
+    const cityIndex = Math.floor(Math.random() * cities.length)
+    const category = categories[Math.floor(Math.random() * categories.length)]
+    const priority = priorities[Math.floor(Math.random() * priorities.length)]
+    const status = statuses[Math.floor(Math.random() * statuses.length)]
+    const userId = users[Math.floor(Math.random() * users.length)].id
+    const createdAt = new Date(Date.now() - Math.random() * 180 * 24 * 60 * 60 * 1000) // Random date within last 6 months
 
-  console.log('Creating 10 sample issues...')
-  
-  // Create 10 sample issues
-  for (let i = 1; i <= 10; i++) {
-    const randomUser = users[Math.floor(Math.random() * users.length)]
-    const randomCategory = categories[Math.floor(Math.random() * categories.length)]
-    const randomPriority = priorities[Math.floor(Math.random() * priorities.length)]
-    const randomStatus = statuses[Math.floor(Math.random() * statuses.length)]
-    const randomLocation = locations[Math.floor(Math.random() * locations.length)]
-    
-    // Create dates within the last 3 months
-    const randomDate = new Date()
-    randomDate.setDate(randomDate.getDate() - Math.floor(Math.random() * 90))
-    
     const issue = await prisma.issue.create({
       data: {
-        title: `Test Issue ${i}: ${randomCategory}`,
-        description: `This is a test issue #${i} with ${randomPriority} priority in ${randomLocation.city}. This is auto-generated for testing purposes.`,
-        category: randomCategory,
-        priority: randomPriority,
-        status: randomStatus,
-        location: `${randomLocation.city} Main Street`,
-        city: randomLocation.city,
-        state: randomLocation.state,
-        zip: randomLocation.zip,
-        createdAt: randomDate,
-        updatedAt: randomDate,
-        userId: randomUser.id,
+        title: `Issue ${i}: ${category.toLowerCase().replace('_', ' ')} problem in ${cities[cityIndex]}`,
+        description: `This is a detailed description of the ${category.toLowerCase().replace('_', ' ')} issue in ${cities[cityIndex]}. It requires immediate attention and affects the local community.`,
+        location: `${cities[cityIndex]}, ${states[cityIndex]}`,
+        city: cities[cityIndex],
+        state: states[cityIndex],
+        zip: Math.floor(10000 + Math.random() * 90000).toString(),
+        category,
+        priority,
+        status,
+        createdAt,
+        updatedAt: new Date(createdAt.getTime() + Math.random() * 7 * 24 * 60 * 60 * 1000), // Random update within a week
+        userId,
       },
     })
-    
-    // Add random comments
-    const commentCount = Math.floor(Math.random() * 3)
-    for (let j = 0; j < commentCount; j++) {
-      const commentUser = users[Math.floor(Math.random() * users.length)]
-      await prisma.comment.create({
-        data: {
-          content: `Comment ${j + 1} on issue #${i}. We are working on this!`,
-          issueId: issue.id,
-          userId: commentUser.id,
-        },
-      })
-    }
-    
-    // Add random upvotes
-    const upvoteCount = Math.floor(Math.random() * 5)
+    issues.push(issue)
+
+    // Add random upvotes (0-15 per issue)
+    const upvoteCount = Math.floor(Math.random() * 16)
     const upvoters = [...users].sort(() => 0.5 - Math.random()).slice(0, upvoteCount)
-    
     for (const upvoter of upvoters) {
       await prisma.upvote.create({
         data: {
-          issueId: issue.id,
           userId: upvoter.id,
+          issueId: issue.id,
+        },
+      })
+    }
+
+    // Add random comments (0-5 per issue)
+    const commentCount = Math.floor(Math.random() * 6)
+    const commenters = [...users].sort(() => 0.5 - Math.random()).slice(0, commentCount)
+    for (const commenter of commenters) {
+      await prisma.comment.create({
+        data: {
+          content: `This is a comment from ${commenter.name} regarding the issue.`,
+          userId: commenter.id,
+          issueId: issue.id,
+          createdAt: new Date(createdAt.getTime() + Math.random() * 30 * 24 * 60 * 60 * 1000), // Random date within a month of issue creation
         },
       })
     }
